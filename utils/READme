@@ -1,0 +1,11 @@
+# Data Preprocessing: 
+
+Currently there is only pmid used to create the calicum_preprocessed.csv dataset 
+Can be used for further programming (perhaps filter entries with no abstract, can be done with new_data = calcium_preprocessed[calcium_preprocessed['abstracts'] != 'No abstract']
+
+
+
+
+
+
+                                     
