@@ -8,7 +8,7 @@ This repository is for the course **188.992 Experiment Design for Data Science (
 
 ### Resources
 - **Project Documentation on Overleaf:** [Overleaf Document](https://www.overleaf.com/project/67754981243b583663860790)
-- **Setup Guide:** [Setting Up the Python Environment and Installing Dependencies](./requirements_setup.md)
+- **Setup Guide:** [Setting Up the Python Environment and Installing Dependencies](docs/python_env_setup.md)
 
 ---
 
