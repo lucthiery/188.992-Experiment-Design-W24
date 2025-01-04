@@ -1,9 +1,18 @@
 # 188.992-Experiment-Design-W24
 188.992 Experiment Design for Data Science (VU 2,0) 2024W
 
-Overleaf Document:
-https://www.overleaf.com/project/67754981243b583663860790
+---
 
+## Overview
+This repository is for the course **188.992 Experiment Design for Data Science (VU 2,0) 2024W**. It includes code, data, and documentation for implementing and analyzing experimental design concepts in data science.
+
+### Resources
+- **Project Documentation on Overleaf:** [Overleaf Document](https://www.overleaf.com/project/67754981243b583663860790)
+- **Setup Guide:** [Setting Up the Python Environment and Installing Dependencies](./requirements_setup.md)
+
+---
+
+## Project Structure
 
 Project(SciMine)/
 
