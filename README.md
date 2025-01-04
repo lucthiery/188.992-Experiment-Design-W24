@@ -40,3 +40,9 @@ main.py - pipeline:
 7. Log and Save Outputs: Save intermediate results (e.g., embeddings, rankings) to results/ and store final evaluation reports and logs.
 
 
+1. Loading and Preprocessing -- Theresa
+2. Specter und Scibert -- Luce
+3.  Variational Aoutoencoder 4.2 -- Steffi
+4.  4.3 Classifer -- Felix
+5.  Results von anderen Methoden nachbauen 
+
