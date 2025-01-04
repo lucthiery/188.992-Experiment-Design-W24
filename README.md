@@ -7,13 +7,21 @@ https://www.overleaf.com/project/67754981243b583663860790
 
 Project(SciMine)/
 ├── main.py              # main pipeline for step by step use of functions
+
 ├── data/                # Datasets and preprocessed data
+
 ├── models/              # Machine learning models
+
 ├── utils/               # Helper functions and utilities
+
 ├── experiments/         # Scripts to run experiments and evaluate results
+
 ├── results/             # Output results and logs
+
 ├── notebooks/           # Jupyter notebooks for testing/debugging
+
 ├── requirements.txt     # Python dependencies
+
 ├── README.md            # Project overview and setup instructions
 
 
