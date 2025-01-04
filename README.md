@@ -6,6 +6,7 @@ https://www.overleaf.com/project/67754981243b583663860790
 
 
 Project(SciMine)/
+
 ├── main.py              # main pipeline for step by step use of functions
 
 ├── data/                # Datasets and preprocessed data
