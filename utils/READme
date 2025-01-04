@@ -1,7 +1,12 @@
-# Data Preprocessing: 
+#Data Preprocessing: 
 
 Currently there is only pmid used to create the calicum_preprocessed.csv dataset 
 Can be used for further programming (perhaps filter entries with no abstract, can be done with new_data = calcium_preprocessed[calcium_preprocessed['abstracts'] != 'No abstract']
+
+
+Next step is to start an analysis, why abstract is missing in 100 entries (maybe there is none) or if it can be included with other ids 
+Then we will add an if clause to use the other ids if there is a NA entry in pmid 
+With this we can create the datasets depression and virus better. 
 
 
 
