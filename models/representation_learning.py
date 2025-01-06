@@ -1,82 +1,61 @@
+from transformers import AutoTokenizer, AutoModel
+from adapters import AutoAdapterModel
+import torch
 import pandas as pd
-from sentence_transformers import SentenceTransformer
 
-def generate_document_embeddings(data, model_name="allenai/specter"):
+
+def generate_document_embeddings(data, model_name="allenai/specter2_base"):
     """
-    Generate document-level embeddings for each row in the dataset.
-    
+    Generate document-level embeddings using the SPECTER model.
+
     Args:
-        data (pd.DataFrame): Preprocessed dataset containing 'title' and 'abstracts' columns.
-        model_name (str): Name of the pre-trained model to use (default: SPECTER).
-        
+        data (pd.DataFrame): Preprocessed dataset with 'title' and 'abstracts'.
+        model_name (str): Hugging Face model name for SPECTER.
+
     Returns:
-        pd.DataFrame: DataFrame with added 'doc_embedding' column containing embeddings.
+        pd.DataFrame: Updated DataFrame with 'doc_embedding'.
     """
-    model = SentenceTransformer(model_name)
-    
-    # Combine title and abstracts for embedding
-    documents = data['title'] + " " + data['abstracts']
-    embeddings = model.encode(documents.tolist(), show_progress_bar=True)
-    
+    # Load SPECTER model and tokenizer
+    tokenizer = AutoTokenizer.from_pretrained(model_name)
+    model = AutoModel.from_pretrained(model_name)
+
+    # Load and activate the SPECTER2 adapter
+    print("start load model")
+    model.load_adapter("allenai/specter2", source="hf", load_as="specter2", set_active=True)
+    print("loaded model")
+    # Combine title and abstract into a single text field
+    text_batch = (data['title'] + tokenizer.sep_token + data['abstracts']).tolist()
+
+    embeddings = []
+    for text in text_batch:
+        # Tokenize the input text
+        inputs = tokenizer(text, padding=True, truncation=True, return_tensors="pt", max_length=512)
+
+        # Generate embeddings with the model
+        with torch.no_grad():
+            outputs = model(**inputs)
+            cls_embedding = outputs.last_hidden_state[:, 0, :]  # Use [CLS] token embedding
+            embeddings.append(cls_embedding.squeeze().numpy())
+
     # Add embeddings to the DataFrame
-    data['doc_embedding'] = embeddings.tolist()
+    data['doc_embedding'] = embeddings
     return data
 
-def generate_phrase_embeddings(data, model_name="allenai/scibert_scivocab_uncased"):
-    """
-    Generate phrase-level embeddings by mining and encoding key phrases in abstracts.
-    
-    Args:
-        data (pd.DataFrame): Dataset containing 'abstracts' column.
-        model_name (str): Name of the pre-trained model to use (default: SciBERT).
-        
-    Returns:
-        pd.DataFrame: DataFrame with added 'phrase_embeddings' column containing embeddings.
-    """
-    model = SentenceTransformer(model_name)
-    
-    # Placeholder for phrase-level embeddings
-    phrase_embeddings = []
-    
-    for abstract in data['abstracts']:
-        # Here you can use a phrase-mining tool like AutoPhrase to extract phrases
-        phrases = extract_phrases(abstract)  # Placeholder for phrase mining
-        if phrases:
-            embeddings = model.encode(phrases, show_progress_bar=False)
-            phrase_embeddings.append(embeddings)
-        else:
-            phrase_embeddings.append([])
-    
-    data['phrase_embeddings'] = phrase_embeddings
-    return data
 
-def extract_phrases(text):
-    """
-    Extract key phrases from the given text (placeholder function).
-    Replace with an actual implementation (e.g., using AutoPhrase).
-    
-    Args:
-        text (str): Input text (abstract).
-        
-    Returns:
-        list: Extracted key phrases.
-    """
-    # Placeholder: Split text into "phrases" (this should use an actual phrase-mining algorithm)
-    return text.split(". ")
 
+
+
+
+# Example usage
 if __name__ == "__main__":
     # Example usage
-    filepath = "data/calcium_preprocessed.csv"
+    filepath = "../data/preprocessed/calcium_preprocessed.csv"
     data = pd.read_csv(filepath)
-    
+
     # Generate document embeddings
     data_with_doc_embeddings = generate_document_embeddings(data)
     print("Document embeddings generated.")
-    
-    # Generate phrase embeddings
-    data_with_phrase_embeddings = generate_phrase_embeddings(data_with_doc_embeddings)
-    print("Phrase embeddings generated.")
-    
+
     # Save the output
-    data_with_phrase_embeddings.to_csv("data/representation_embeddings.csv", index=False)
-    print("Embeddings saved to 'data/representation_embeddings.csv'.")
+    data_with_doc_embeddings.to_csv("../Data/embeddings/representation_embeddings.csv", index=False)
+    print("Embeddings saved to '../Data/embeddings/representation_embeddings.csv'.")

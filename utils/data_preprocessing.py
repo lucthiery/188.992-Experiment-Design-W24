@@ -3,12 +3,13 @@
 
 
 import pandas as pd 
-import requests 
+import requests
+import os
 from xml.etree import ElementTree as ET
 
-calcium = pd.read_csv('Cohen_2006_CalciumChannelBlockers_ids.csv')
-depression = pd.read_csv('Bannach-Brown_2019_ids.csv')
-virus = pd.read_csv('Kwok_2020_ids.csv')
+calcium = pd.read_csv('../Data/original/Cohen_2006_CalciumChannelBlockers_ids.csv')
+depression = pd.read_csv('../Data/original/Bannach-Brown_2019_ids.csv')
+virus = pd.read_csv('../Data/original/Kwok_2020_ids.csv')
 
 print('Calcium missing values')
 print(calcium.isna().sum())
@@ -70,8 +71,11 @@ calcium_preprocessed = append_metadata(calcium, 'pmid')
 print(calcium_preprocessed[calcium_preprocessed['abstracts'] == 'No abstract'].count())
 
 
-#vorläufiges Speichern 
-calcium_preprocessed.to_csv('calcium_preprocessed.csv')
+#vorläufiges Speichern
+target_dir = "../Data/preprocessed/"
+file_path = os.path.join(target_dir, "calcium_preprocessed.csv")
+calcium_preprocessed.to_csv(file_path, index=False)
+
 
 #TO DO: 
 # ADD Procedure for ID for openalex and OID with if condition (if pmid not exists use oid or openalexid)
