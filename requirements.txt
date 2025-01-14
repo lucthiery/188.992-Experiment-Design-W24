@@ -5,4 +5,5 @@ matplotlib==3.9.2
 seaborn==0.13.2
 scikit-learn==1.5.2
 PyYAML==6.0.2
-logging==0.4.9.6
+requests==2.26.0
+asreview==1.6.3
