@@ -66,17 +66,17 @@ df = pd.DataFrame(calcium_preprocessed)
 #First we start with the plain model without any balancing 
 y_test, y_pred, y_pred_proba = nb_function(df,0.2, unbalanced = False, switch_model = False)
 print('WSS@85 for plain model',wss(y_test,y_pred, 0.85))
-print('WSS@95 for plain model',wss(y_test,y_pred, 0.85))
+print('WSS@95 for plain model',wss(y_test,y_pred, 0.95))
 
 #Next we try the balanced model 
 y_test, y_pred, y_pred_proba = nb_function(df,0.2, unbalanced = True, switch_model = False)
 print('WSS@85 for balanced model',wss(y_test,y_pred, 0.85))
-print('WSS@95 for balanced model',wss(y_test,y_pred, 0.85))
+print('WSS@95 for balanced model',wss(y_test,y_pred, 0.95))
 
 #Now we try a different approach by using the complementNB , here we dont need balancing
 y_test, y_pred, y_pred_proba = nb_function(df,0.2, unbalanced = False, switch_model = True)
 print('WSS@85 for ComplementNB model',wss(y_test,y_pred, 0.85))
-print('WSS@95 for ComplementNB model',wss(y_test,y_pred, 0.85))
+print('WSS@95 for ComplementNB model',wss(y_test,y_pred, 0.95))
 
 
 
