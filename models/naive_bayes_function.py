@@ -7,6 +7,12 @@ from sklearn.naive_bayes import MultinomialNB
 from sklearn.metrics import classification_report, accuracy_score, confusion_matrix
 from imblearn.over_sampling import SMOTE
 
+
+#You can choose between: 
+#1. You use the plain Naive Bayes model without the consideration of unbalanced data, for this the function is already predefined unbalanced = False 
+# If you want to include SMOTE for balancing data, set unbalanced = True  
+# If you want to use a different model, that already includes balancing (ComplementNB, see https://people.csail.mit.edu/jrennie/papers/icml03-nb.pdf for further information= 
+
 def nb_function(df,testsize, unbalanced = False, switch_model = False): 
     
     #Create a combined column of title and abstract for embeddings later 
