@@ -126,11 +126,13 @@ These API clients are implemented in the `api/` directory:
 - `openalex_client.py`
 - `crossref_client.py` (newly implemented with extensive documentation)
 
-The fallback logic is defined in the `utils/data_utils.py` file, where asynchronous tasks are created for each dataset row.  The cascading fallback mechanism (PubMed → OpenAlex → CrossRef) in `utils/data_utils.py` to enrich the data with article metadata. It fetches the metadata such as title and abstract from the given links in the datasets, that can be found in `Data/original`
+The fallback logic is defined in the `utils/data_utils.py` file, where asynchronous tasks are created for each dataset row.  The cascading fallback mechanism (PubMed → OpenAlex → CrossRef) in `utils/data_utils.py` to enrich the data with article metadata. It fetches the metadata such as title and abstract from the given links in the datasets, that can be found in `Data/original`.
+
+However, the metadata retrieval will create the preprocessed csv files in the folder `DATA\preprocessed`. However. the filename will start with the timestamp. So you need to rename the filenames manually after executing the preprocessing step in order to use the latest preprocessed data.
 
 ## Baseline Recreation
 
-We decided to recreate two of the given baslines, the Naive Bayes model with TF-IDF transformation and the SVM with doc2vec embeddings. You can find further information in the folder models in the files "naive_bayes_function.py" and "alternative_nb_with_cv.py" for Naive Bayes and in "d2v+svm.R" for SVM. 
+We decided to recreate two of the given baslines, the Naive Bayes model with TF-IDF transformation and the SVM with doc2vec embeddings. You can find further information in the folder models in the files "naive_bayes_function.py" and "alternative_nb_with_cv.py" for Naive Bayes and in "d2v+svm.R" for SVM.
 
 ## Project Structure
 
@@ -284,7 +286,6 @@ This guide explains how to set up a Python environment using `venv` and install 
    When executing this code, make sure you are within the project directory. Otherwise specify the path.
 
    **`IMPORTANT NOTE:`** In order to run the code, you also need to have installed R with Version 4.4 or higher, als the main.py is also running a subprocess for executing R code. In R make sure, you have the following libraries installed, as referenced in our report paper in section 3.3.
-
 
 8. **Deactivate the Virtual Environment:**
 
