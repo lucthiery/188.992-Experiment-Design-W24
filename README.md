@@ -128,6 +128,9 @@ These API clients are implemented in the `api/` directory:
 
 The fallback logic is defined in the `utils/data_utils.py` file, where asynchronous tasks are created for each dataset row.  The cascading fallback mechanism (PubMed → OpenAlex → CrossRef) in `utils/data_utils.py` to enrich the data with article metadata. It fetches the metadata such as title and abstract from the given links in the datasets, that can be found in `Data/original`
 
+## Baseline Recreation 
+We decided to recreate two of the given baslines, the Naive Bayes model with TF-IDF transformation and the SVM with doc2vec embeddings. You can find further information in the folder models in the files "naive_bayes_function.py" and "alternative_nb_with_cv.py" for Naive Bayes and in "d2v+svm.R" for SVM. 
+
 ## Project Structure
 
 ```text
