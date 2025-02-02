@@ -178,7 +178,7 @@ def wss(y_true, y_pred, recall_level):
     wss_score = (tn + fn) / n - (1 - recall_level)
     return wss_score                               # Return the computed WSS score
 
-
+"""
 if __name__ == "__main__":
     # Example usage of the scoring functions for demonstration purposes.
     
@@ -194,7 +194,7 @@ if __name__ == "__main__":
     percentage = 10           # Percentage of documents to screen for RRF calculations (10%).
     recall_level_85 = 0.85    # Target recall level (85% recall).
     recall_level_95 = 0.95    # Target recall level (95% recall).
-    """
+
     # Calculate RRF using the ranking-based method.
     rrf_ranking = calculate_rrf_by_ranking(y_true_example, y_scores_example, percentage=percentage)
     # Calculate RRF using the random split method (with a fixed seed for reproducibility).

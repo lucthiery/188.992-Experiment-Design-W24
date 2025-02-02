@@ -13,12 +13,11 @@ import os
 import nltk
 nltk.download('stopwords')
 
+from utils.logger import Logger
 from utils.evaluation_metrics import wss
 
 
-calcium_preprocessed = pd.read_csv('../data/preprocessed/calcium_preprocessed.csv')
-virus_preprocessed = pd.read_csv('../data/preprocessed/virus_preprocessed.csv')
-depression_preprocessed = pd.read_csv('../data/preprocessed/depression_preprocessed.csv')
+logger = Logger(__name__)
 
 def model_nb(data,dataset_name, label):
     nltk.download('stopwords')
@@ -112,10 +111,44 @@ def model_nb(data,dataset_name, label):
 
 
 
+def alternate_nb_with_cv_main():
+        # Get the absolute path of the project root (not the current script's folder)
+    project_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+    # Construct the absolute path to 'Data/preprocessed/'
+    preprocessed_folder = os.path.join(project_folder, 'Data', 'preprocessed')
 
-result_calcium = model_nb(calcium_preprocessed, "Calcium", 'label_included')
-result_depression = model_nb(depression_preprocessed, "Depression", 'label_included')
-result_virus = model_nb(virus_preprocessed, "Virus", 'label_included')
+    # Check if the folder exists
+    if os.path.exists(preprocessed_folder):
+        logger.info(f"The folder exists: {preprocessed_folder}")
+    else:
+        logger.error(f"The folder does not exist: {preprocessed_folder}")
+
+    # Construct the full paths to the CSV files
+    calcium_file_path = os.path.join(preprocessed_folder, 'calcium_preprocessed.csv')
+    virus_file_path = os.path.join(preprocessed_folder, 'virus_preprocessed.csv')
+    depression_file_path = os.path.join(preprocessed_folder, 'depression_preprocessed.csv')
+
+    # Verify each file exists before loading
+    for file_path in [calcium_file_path, virus_file_path, depression_file_path]:
+        if not os.path.exists(file_path):
+            logger.error(f"File not found: {file_path}")
+            
+    # Load the CSV files (only if they exist)
+    try:
+        calcium_preprocessed = pd.read_csv(calcium_file_path)
+        virus_preprocessed = pd.read_csv(virus_file_path)
+        depression_preprocessed = pd.read_csv(depression_file_path)
+    except FileNotFoundError as e:
+        logger.error(f"Error loading CSV file: {e}")
+
+    result_calcium = model_nb(calcium_preprocessed, "Calcium", 'label_included')
+    result_depression = model_nb(depression_preprocessed, "Depression", 'label_included')
+    result_virus = model_nb(virus_preprocessed, "Virus", 'label_included')
+
+    print(result_calcium)
+    print(result_depression)
+    print(result_virus)
+    
 
 
