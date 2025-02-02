@@ -18,7 +18,7 @@ def nb_function(df,testsize, unbalanced = False, switch_model = False):
     #Create a combined column of title and abstract for embeddings later 
     df['combined']= df['title'] + df['abstracts']   
     #split the data into training and test
-    X_train, X_test, y_train, y_test = train_test_split(df['combined'], df['label_included'], test_size = testsize, stratify = df['label_included'], random_state = 42)
+    X_train, X_test, y_train, y_test = train_test_split(df['combined'], df['label_included'], test_size = testsize, stratify = df['label_included'], random_state = 12345)
     
     #do the TFIDF Transformation 
     vectorizer = TfidfVectorizer(ngram_range=(1, 2), max_features = 1000, stop_words="english")
@@ -57,30 +57,48 @@ def wss(y_test, y_pred, recall_level):
 
 
 calcium_preprocessed = pd.read_csv('calcium_preprocessed.csv')
+virus_preprocessed = pd.read_csv('virus_preprocessed.csv')
 
+df2 = pd.DataFrame(virus_preprocessed)
+
+df2['title'] = df2['titles']
 
 df = pd.DataFrame(calcium_preprocessed)
 
 
 
 #First we start with the plain model without any balancing 
-y_test, y_pred, y_pred_proba = nb_function(df,0.2, unbalanced = False, switch_model = False)
+y_test, y_pred, y_pred_proba = nb_function(df,0.3, unbalanced = False, switch_model = False)
 print('WSS@85 for plain model',wss(y_test,y_pred, 0.85))
 print('WSS@95 for plain model',wss(y_test,y_pred, 0.95))
 
 #Next we try the balanced model 
-y_test, y_pred, y_pred_proba = nb_function(df,0.2, unbalanced = True, switch_model = False)
+y_test, y_pred, y_pred_proba = nb_function(df,0.3, unbalanced = True, switch_model = False)
 print('WSS@85 for balanced model',wss(y_test,y_pred, 0.85))
 print('WSS@95 for balanced model',wss(y_test,y_pred, 0.95))
 
 #Now we try a different approach by using the complementNB , here we dont need balancing
-y_test, y_pred, y_pred_proba = nb_function(df,0.2, unbalanced = False, switch_model = True)
+y_test, y_pred, y_pred_proba = nb_function(df,0.3, unbalanced = False, switch_model = True)
 print('WSS@85 for ComplementNB model',wss(y_test,y_pred, 0.85))
 print('WSS@95 for ComplementNB model',wss(y_test,y_pred, 0.95))
 
 
 
+#Doing the same for the virus dataset
+print('Results for Virus dataset')
+y_test2, y_pred2, y_pred_proba2 = nb_function(df2,0.3, unbalanced = False, switch_model = False)
+print('WSS@85 for plain model',wss(y_test2,y_pred2, 0.85))
+print('WSS@95 for plain model',wss(y_test2,y_pred2, 0.95))
 
+#Next we try the balanced model 
+y_test2, y_pred2, y_pred_proba2 = nb_function(df2,0.3, unbalanced = True, switch_model = False)
+print('WSS@85 for balanced model',wss(y_test2,y_pred2, 0.85))
+print('WSS@95 for balanced model',wss(y_test2,y_pred2, 0.95))
+
+#Now we try a different approach by using the complementNB , here we dont need balancing
+y_test2, y_pred2, y_pred_proba2 = nb_function(df2,0.3, unbalanced = False, switch_model = True)
+print('WSS@85 for ComplementNB model',wss(y_test2,y_pred2, 0.85))
+print('WSS@95 for ComplementNB model',wss(y_test2,y_pred2, 0.95))
 
 
 
