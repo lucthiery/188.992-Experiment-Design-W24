@@ -58,13 +58,17 @@ def wss(y_test, y_pred, recall_level):
 
 calcium_preprocessed = pd.read_csv('calcium_preprocessed.csv')
 virus_preprocessed = pd.read_csv('virus_preprocessed.csv')
+depression_preprocessed = pd.read_csv('depression_preprocessed.csv')
+
+
+df = pd.DataFrame(calcium_preprocessed)
 
 df2 = pd.DataFrame(virus_preprocessed)
 
 df2['title'] = df2['titles']
 
-df = pd.DataFrame(calcium_preprocessed)
-
+df3 = pd.DataFrame(depression_preprocessed)
+df3['title'] = df3['titles']
 
 
 #First we start with the plain model without any balancing 
@@ -101,6 +105,21 @@ print('WSS@85 for ComplementNB model',wss(y_test2,y_pred2, 0.85))
 print('WSS@95 for ComplementNB model',wss(y_test2,y_pred2, 0.95))
 
 
+#Doing the same for the depression dataset
+print('Results for Depression dataset')
+y_test3, y_pred3, y_pred_proba3 = nb_function(df3,0.3, unbalanced = False, switch_model = False)
+print('WSS@85 for plain model',wss(y_test3,y_pred3, 0.85))
+print('WSS@95 for plain model',wss(y_test3,y_pred3, 0.95))
+
+#Next we try the balanced model 
+y_test3, y_pred3, y_pred_proba3 = nb_function(df3,0.3, unbalanced = True, switch_model = False)
+print('WSS@85 for balanced model',wss(y_test3,y_pred3, 0.85))
+print('WSS@95 for balanced model',wss(y_test3,y_pred3, 0.95))
+
+#Now we try a different approach by using the complementNB , here we dont need balancing
+y_test3, y_pred3, y_pred_proba3 = nb_function(df3,0.3, unbalanced = False, switch_model = True)
+print('WSS@85 for ComplementNB model',wss(y_test3,y_pred3, 0.85))
+print('WSS@95 for ComplementNB model',wss(y_test3,y_pred3, 0.95))
 
 
 
