@@ -1,3 +1,6 @@
+# ./utils/data_utils.py
+
+
 # Import required libraries
 import os
 import asyncio
@@ -12,24 +15,29 @@ from typing import List, Tuple, Dict, Union
 from utils.logger import Logger
 from api.pubmed_client import PubMedClient
 from api.openalex_client import OpenAlexClient
+from api.crossref_client import CrossrefClient
 
-# Create a logger instance
+# Create a logger instance for this module
 logger = Logger(__name__)
 
 async def process_files(
         file_path:str,
         pubmed_client: PubMedClient,
         openalex_client: OpenAlexClient,
+        crossref_client: CrossrefClient,
         output_dir: str
         ) -> None:
     """
-    Process a CSV file, fetch metadata (title and abstract) for each record, and save the preprocessed data.
+    Processes a CSV file by loading it, fetching metadata for each article using a cascading
+    fallback mechanism (PubMed -> OpenAlex -> CrossRef), and saving the augmented DataFrame as
+    a new CSV file in the specified output directory.
     
     Args:
-        file_path (str): Path to the CSV file to be processed.
-        pubmed_client (PubMedClient): The client for fetching metadata from PubMed.
-        openalex_client (OpenAlexClient): The client for fetching metadata from OpenAlex.
-        output_dir (str): Directory where the preprocessed CSV file will be saved.
+        file_path (str): The path to the input CSV file.
+        pubmed_client (PubMedClient): The client instance for PubMed.
+        openalex_client (OpenAlexClient): The client instance for OpenAlex.
+        crossref_client (CrossrefClient): The client instance for CrossRef.
+        output_dir (str): The directory where the processed CSV file will be saved.
     """
 
     try:
@@ -41,9 +49,11 @@ async def process_files(
         df_meta = await append_metadata_with_fallback_async(
                 df, 
                 pubmed_client, 
-                openalex_client, 
+                openalex_client,
+                crossref_client,
                 pmid_column="pmid", 
-                openalex_column="openalex_id"
+                openalex_column="openalex_id",
+                doi_column="doi"
             )
         
         # Store the preprocessed dataset in the processed data directory
@@ -70,68 +80,85 @@ async def _fetch_with_fallback(
             row: pd.Series,
             pubmed_client: PubMedClient,
             openalex_client: OpenAlexClient,
+            crossref_client: CrossrefClient,
             pmid_column: str = "pmid",
-            openalex_column: str = "openalex_id"
+            openalex_column: str = "openalex_id",
+            doi_column: str = "doi"
         ) -> Tuple[str, str]:
     """
-    Fetch metadata (title and abstract) for a given row using PubMed and OpenAlex with a fallback mechanism.
+    Retrieve metadata (title and abstract) using a cascading fallback mechanism.
     
-    First tries to fetch metadata using PubMed, and if PubMed doesn't return valid data,
-    it falls back to OpenAlex if the OpenAlex ID is available.
+    The function attempts to fetch metadata in the following order:
+        1. From PubMed using the PMID.
+        2. From OpenAlex using the OpenAlex ID if PubMed returns default values.
+        3. From CrossRef using the DOI if both PubMed and OpenAlex fail.
     
     Args:
-        session (aiohttp.ClientSession): The session used for making HTTP requests.
-        row (pd.Series): A row of data containing the identifiers (PMID, OpenAlex ID).
-        pubmed_client (PubMedClient): The PubMed client used for fetching metadata from PubMed.
-        openalex_client (OpenAlexClient): The OpenAlex client used for fetching metadata from OpenAlex.
-        pmid_column (str): The column name in the DataFrame that contains the PubMed ID.
-        openalex_column (str): The column name in the DataFrame that contains the OpenAlex ID.
-        
+        session (aiohttp.ClientSession): The aiohttp session used for HTTP requests.
+        row (pd.Series): A row from the DataFrame containing the article identifiers.
+        pubmed_client (PubMedClient): The client instance for PubMed.
+        openalex_client (OpenAlexClient): The client instance for OpenAlex.
+        crossref_client (CrossrefClient): The client instance for CrossRef.
+        pmid_column (str): Name of the column containing the PubMed ID.
+        openalex_column (str): Name of the column containing the OpenAlex ID.
+        doi_column (str): Name of the column containing the DOI.
+    
     Returns:
-        Tuple[str, str]: A tuple containing the title and abstract of the work.
+        Tuple[str, str]: A tuple containing the title and abstract.
     """
 
+    # Extract identifiers from the row
     pmid = row[pmid_column]             # Extract the PubMed ID
     openalex_id = row[openalex_column]  # Extract the OpenAlex ID
+    doi = row[doi_column]               # Extract the DOI
 
-    # First, try fetching data from PubMed
+    # Attempt 1: Try to fetch data from PubMed using the PMID.
     title, abstract = await pubmed_client.fetch_pubmed_data(session, str(pmid))
     
-    # If PubMed didn't return valid data, and OpenAlex ID is available, fallback to OpenAlex
+    # Attempt 2: If PubMed returns default values, try OpenAlex using the OpenAlex ID.
     if title == "No title" and abstract == "No abstract":
-        # Check if the OpenAlex ID is available and not empty
         if pd.notna(openalex_id) and str(openalex_id).strip() != "":
-            logger.info(f"Falling back to OpenAlex for paper with PMID {pmid} and OpenAlex ID {openalex_id}")
+            logger.info(f"Falling back to OpenAlex for PMID {pmid} with OpenAlex ID {openalex_id}")
             title, abstract = await openalex_client.fetch_openalex_data(session, str(openalex_id))
-    
-    # Return the title and abstract
+
+    # Attempt 3: If both PubMed and OpenAlex return default values, use CrossRef with the DOI.
+    if title == "No title" and abstract == "No abstract":
+        if pd.notna(doi) and str(doi).strip() != "":
+            logger.info(f"Falling back to CrossRef for DOI {doi}")
+            title, abstract = await crossref_client.fetch_crossref_data(session, str(doi))
+
     return title, abstract
 
 
 
 
 async def append_metadata_with_fallback_async(
-          df: pd.DataFrame,
+        df: pd.DataFrame,
         pubmed_client: PubMedClient,
         openalex_client: OpenAlexClient,
+        crossref_client: CrossrefClient,
         pmid_column: str = "pmid",
-        openalex_column: str = "openalex_id"
+        openalex_column: str = "openalex_id",
+        doi_column: str = "doi"
     ) -> pd.DataFrame:
     """
-    Append metadata (titles and abstracts) to a DataFrame using a fallback mechanism.
+    Appends metadata (titles and abstracts) to the DataFrame using a cascading fallback mechanism.
     
-    This method iterates over each row in the DataFrame and fetches metadata using PubMed, 
-    and if necessary, falls back to OpenAlex. It fetches the data asynchronously.
+    This function processes each row asynchronously. It first attempts to retrieve data from PubMed,
+    then falls back to OpenAlex, and finally to CrossRef if needed. The results are added as new
+    columns to the DataFrame.
     
     Args:
-        df (pd.DataFrame): The input DataFrame containing the identifiers (PMID, OpenAlex ID).
-        pubmed_client (PubMedClient): The PubMed client used for fetching metadata from PubMed.
-        openalex_client (OpenAlexClient): The OpenAlex client used for fetching metadata from OpenAlex.
-        pmid_column (str): The column name in the DataFrame that contains the PubMed ID.
-        openalex_column (str): The column name in the DataFrame that contains the OpenAlex ID.
-        
+        df (pd.DataFrame): The input DataFrame containing article identifiers.
+        pubmed_client (PubMedClient): The client instance for PubMed.
+        openalex_client (OpenAlexClient): The client instance for OpenAlex.
+        crossref_client (CrossrefClient): The client instance for CrossRef.
+        pmid_column (str): Name of the column with the PubMed ID.
+        openalex_column (str): Name of the column with the OpenAlex ID.
+        doi_column (str): Name of the column with the DOI.
+    
     Returns:
-        pd.DataFrame: The DataFrame with added columns for titles and abstracts.
+        pd.DataFrame: The DataFrame with added "titles" and "abstracts" columns.
     """
 
     # Create a copy of the original DataFrame to work on
@@ -140,12 +167,23 @@ async def append_metadata_with_fallback_async(
     # Fetch metadata for each row asynchronously
     async with aiohttp.ClientSession() as session:  # Create an asynchronous HTTP session
         tasks = []  # List to hold all the asynchronous tasks
-        for _, row in result_df.iterrows(): # Iterate over each row in the DataFrame
+        # Create an asynchronous task for each row to fetch metadata.
+        for _, row in result_df.iterrows():
             task = asyncio.create_task(
-                _fetch_with_fallback(session, row, pubmed_client, openalex_client, pmid_column, openalex_column)
-            )   # Create a task for each row to fetch metadata
+                _fetch_with_fallback(
+                    session,
+                    row,
+                    pubmed_client,
+                    openalex_client,
+                    crossref_client,
+                    pmid_column,
+                    openalex_column,
+                    doi_column
+                )
+            )
             tasks.append(task)  # Append the task to the list of tasks
-        results = await asyncio.gather(*tasks)  # Wait for all tasks to complete
+        # Wait for all tasks to complete concurrently.
+        results = await asyncio.gather(*tasks)
 
     # Add the fetched titles and abstracts to the DataFrame
     result_df["titles"] = [res[0] for res in results]

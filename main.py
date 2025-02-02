@@ -9,6 +9,7 @@ from utils.logger import Logger
 from utils.data_utils import process_files
 from api.pubmed_client import PubMedClient
 from api.openalex_client import OpenAlexClient
+from api.crossref_client import CrossrefClient
 
 
 # Create a logger instance
@@ -40,6 +41,10 @@ async def _data_processing():
     openalex_client = OpenAlexClient(rate_limit=rate_limit)
     openalex_client.logger.info("Base API is working")
 
+    # Initialize CrossRefClient with the specified rate limit
+    crossref_client = CrossrefClient(rate_limit=rate_limit)
+    crossref_client.logger.info("CrossRef API client initialized.")
+
     # Define the input and output directories
     input_dir = "./Data/original/"
     output_dir = "./Data/preprocessed/"
@@ -53,7 +58,7 @@ async def _data_processing():
     for file_path in file_paths:
         # For each file found, call the `process_files` function asynchronously
         # `process_files` will handle the interaction with PubMed and OpenAlex clients
-        await process_files(file_path, pubmed_client, openalex_client, output_dir)
+        await process_files(file_path, pubmed_client, openalex_client, crossref_client, output_dir)
 
 
 # Main function
