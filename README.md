@@ -4,7 +4,7 @@
 
 188.992 Experiment Design for Data Science (VU 2,0) 2024W
 
-- **Project Documentation on Overleaf:** [Overleaf Document](https://www.overleaf.com/project/67754981243b583663860790)
+- **Link to published Paper ond Zenodo:** [SciMine: An Efficient Systematic Prioritization Model Based on Richer Semantic Information - Experiment Design Report Group 22](https://zenodo.org/me/requests/e9dad706-0f2e-4603-9018-0e25dcfa4967)
 - **Setup Guide:** [Setting Up the Python Environment and Installing Dependencies](docs/python_env_setup.md)
 - **SciMine Paper:** [SciMine: An Efficient Systematic Prioritization Model Based on Richer Semantic Information](https://dl.acm.org/doi/10.1145/3539618.3591764)
 - **WSS Metric definition:** [An analysis of work saved over sampling in the evaluation of automated citation screening in systematic literature reviews](https://www.sciencedirect.com/science/article/pii/S2667305323000182?ref=pdf_download&fr=RR-2&rr=90b1528aca755ae8)
@@ -129,6 +129,7 @@ These API clients are implemented in the `api/` directory:
 The fallback logic is defined in the `utils/data_utils.py` file, where asynchronous tasks are created for each dataset row.  The cascading fallback mechanism (PubMed → OpenAlex → CrossRef) in `utils/data_utils.py` to enrich the data with article metadata. It fetches the metadata such as title and abstract from the given links in the datasets, that can be found in `Data/original`
 
 ## Baseline Recreation 
+
 We decided to recreate two of the given baslines, the Naive Bayes model with TF-IDF transformation and the SVM with doc2vec embeddings. You can find further information in the folder models in the files "naive_bayes_function.py" and "alternative_nb_with_cv.py" for Naive Bayes and in "d2v+svm.R" for SVM. 
 
 ## Project Structure
@@ -173,3 +174,93 @@ We decided to recreate two of the given baslines, the Naive Bayes model with TF-
     `-- logger.py
 
 ```
+
+## Setting Up the Python Environment and Installing Dependencies
+
+This guide explains how to set up a Python environment using `venv` and install the required dependencies from the `requirements.txt` file.
+
+### Prerequisites
+
+- Python 3.11 must be installed on your system.
+- Ensure `pip` is installed and accessible.
+
+## Steps to Set Up the Environment
+
+1. **Create a Virtual Environment:**
+
+   Open a terminal in the root directory of the project and run the following command to create a virtual environment:
+
+   ```bash
+   python -m venv .venv
+   ```
+
+   Replace `name_of_virtual_environment` with your desired name for the environment.
+
+2. **Activate the Virtual Environment:**
+   - On **Windows**:
+
+     ```bash
+     name_of_virtual_environment\Scripts\activate
+     ```
+
+   - On **macOS/Linux**:
+
+     ```bash
+     source name_of_virtual_environment/bin/activate
+     ```
+
+3. **Upgrade `pip`:**
+   It is recommended to upgrade `pip` to the latest version before installing dependencies:
+
+   ```bash
+   pip install --upgrade pip
+   ```
+
+4. **Install Dependencies:**
+   Use the following command to install the required packages listed in `requirements.txt`:
+
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+5. **Verify Installation:**
+   Check if the necessary packages are installed correctly by running:
+
+   ```bash
+   pip list
+   ```
+
+   This will display all installed packages and their versions.
+
+6. **Run the code:**
+
+   The code is designed to run automatically, be executing the `main.py` file in the `root directory`.
+
+   To do so, you can run the following command in your cli, assuming you are working with a Linux distribution. For Windows please check the python documentation on how to run python code on Windows. However, we recommend to use WLS when working on Windows.
+
+   ```text
+   python3 main.py
+   ````
+
+   When executing this code, make sure you are within the project directory. Otherwise specify the path.
+
+7. **Deactivate the Virtual Environment:**
+
+   Once you have completed your work, deactivate the virtual environment by running:
+
+   ```bash
+   deactivate
+   ```
+
+## Notes
+
+- Always activate the virtual environment before working on the project to ensure you use the correct Python environment.
+- If new dependencies are added to the project, update the `requirements.txt` file using:
+
+  ```bash
+  pip freeze > requirements.txt
+  ```
+
+This will regenerate the `requirements.txt` file with all currently installed packages.
+
+By following these steps, you can ensure a consistent and isolated environment for your project.
