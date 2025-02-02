@@ -8,6 +8,9 @@ from sklearn.metrics import classification_report, accuracy_score, confusion_mat
 from imblearn.over_sampling import SMOTE
 
 
+from utils.evaluation_metrics import wss
+
+
 #You can choose between: 
 #1. You use the plain Naive Bayes model without the consideration of unbalanced data, for this the function is already predefined unbalanced = False 
 # If you want to include SMOTE for balancing data, set unbalanced = True  
@@ -46,28 +49,23 @@ def nb_function(df,testsize, unbalanced = False, switch_model = False):
 
 
 
-def wss(y_test, y_pred, recall_level): 
-    
-    #we need the length for the formula (can either be from pred or true, should be equal)
-    n = len(y_test)
-    #compute the confusion matrix
-    tn, fp, fn, tp = confusion_matrix(y_test, y_pred).ravel()
-    wss = (tn + fn) / n - (1 - recall_level)
-    return(wss) 
 
 
-calcium_preprocessed = pd.read_csv('calcium_preprocessed.csv')
-virus_preprocessed = pd.read_csv('virus_preprocessed.csv')
-depression_preprocessed = pd.read_csv('depression_preprocessed.csv')
+calcium_preprocessed = pd.read_csv('../data/preprocessed/calcium_preprocessed.csv')
+virus_preprocessed = pd.read_csv('../data/preprocessed/virus_preprocessed.csv')
+depression_preprocessed = pd.read_csv('../data/preprocessed/depression_preprocessed.csv')
 
 
 df = pd.DataFrame(calcium_preprocessed)
 
 df2 = pd.DataFrame(virus_preprocessed)
 
+df3 = pd.DataFrame(depression_preprocessed)
+
+#df['title'] = df['titles']
+
 df2['title'] = df2['titles']
 
-df3 = pd.DataFrame(depression_preprocessed)
 df3['title'] = df3['titles']
 
 
@@ -75,6 +73,7 @@ df3['title'] = df3['titles']
 y_test, y_pred, y_pred_proba = nb_function(df,0.3, unbalanced = False, switch_model = False)
 print('WSS@85 for plain model',wss(y_test,y_pred, 0.85))
 print('WSS@95 for plain model',wss(y_test,y_pred, 0.95))
+
 
 #Next we try the balanced model 
 y_test, y_pred, y_pred_proba = nb_function(df,0.3, unbalanced = True, switch_model = False)
@@ -122,7 +121,60 @@ print('WSS@85 for ComplementNB model',wss(y_test3,y_pred3, 0.85))
 print('WSS@95 for ComplementNB model',wss(y_test3,y_pred3, 0.95))
 
 
+results = {
+    "Dataset": [],
+    "Model": [],
+    "WSS@85": [],
+    "WSS@95": []
+}
 
+def store_results(dataset_name, model_name, wss85, wss95):
+    """
+    Store WSS results for a specific dataset and model configuration.
+    """
+    results["Dataset"].append(dataset_name)
+    results["Model"].append(model_name)
+    results["WSS@85"].append(wss85)
+    results["WSS@95"].append(wss95)
+
+# Dataset 1: Calcium
+print('Results for Calcium dataset')
+y_test, y_pred, y_pred_proba = nb_function(df, 0.3, unbalanced=False, switch_model=False)
+store_results("Calcium", "Plain Model", wss(y_test, y_pred, 0.85), wss(y_test, y_pred, 0.95))
+
+y_test, y_pred, y_pred_proba = nb_function(df, 0.3, unbalanced=True, switch_model=False)
+store_results("Calcium", "Balanced Model", wss(y_test, y_pred, 0.85), wss(y_test, y_pred, 0.95))
+
+y_test, y_pred, y_pred_proba = nb_function(df, 0.3, unbalanced=False, switch_model=True)
+store_results("Calcium", "ComplementNB", wss(y_test, y_pred, 0.85), wss(y_test, y_pred, 0.95))
+
+# Dataset 2: Virus
+print('Results for Virus dataset')
+y_test2, y_pred2, y_pred_proba2 = nb_function(df2, 0.3, unbalanced=False, switch_model=False)
+store_results("Virus", "Plain Model", wss(y_test2, y_pred2, 0.85), wss(y_test2, y_pred2, 0.95))
+
+y_test2, y_pred2, y_pred_proba2 = nb_function(df2, 0.3, unbalanced=True, switch_model=False)
+store_results("Virus", "Balanced Model", wss(y_test2, y_pred2, 0.85), wss(y_test2, y_pred2, 0.95))
+
+y_test2, y_pred2, y_pred_proba2 = nb_function(df2, 0.3, unbalanced=False, switch_model=True)
+store_results("Virus", "ComplementNB", wss(y_test2, y_pred2, 0.85), wss(y_test2, y_pred2, 0.95))
+
+# Dataset 3: Depression
+print('Results for Depression dataset')
+y_test3, y_pred3, y_pred_proba3 = nb_function(df3, 0.3, unbalanced=False, switch_model=False)
+store_results("Depression", "Plain Model", wss(y_test3, y_pred3, 0.85), wss(y_test3, y_pred3, 0.95))
+
+y_test3, y_pred3, y_pred_proba3 = nb_function(df3, 0.3, unbalanced=True, switch_model=False)
+store_results("Depression", "Balanced Model", wss(y_test3, y_pred3, 0.85), wss(y_test3, y_pred3, 0.95))
+
+y_test3, y_pred3, y_pred_proba3 = nb_function(df3, 0.3, unbalanced=False, switch_model=True)
+store_results("Depression", "ComplementNB", wss(y_test3, y_pred3, 0.85), wss(y_test3, y_pred3, 0.95))
+
+# Convert results to DataFrame and save as CSV
+results_df = pd.DataFrame(results)
+results_df.to_csv("../results.csv", index=False)
+
+print("Results saved to results.csv")
 
 
 

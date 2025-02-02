@@ -9,10 +9,16 @@ from nltk.corpus import stopwords
 from imblearn.over_sampling import SMOTE
 from sklearn.model_selection import train_test_split
 
-calcium_preprocessed = pd.read_csv('calcium_preprocessed.csv')
-virus_preprocessed = pd.read_csv('virus_preprocessed.csv')
+import nltk
+nltk.download('stopwords')
 
-def model_nb_wss(data, label, recall_level): 
+
+calcium_preprocessed = pd.read_csv('../data/preprocessed/calcium_preprocessed.csv')
+virus_preprocessed = pd.read_csv('../data/preprocessed/virus_preprocessed.csv')
+depression_preprocessed = pd.read_csv('../data/preprocessed/depression_preprocessed.csv')
+
+def model_nb(data, label, recall_level):
+    nltk.download('stopwords')
     X = data.drop(label, axis = 1)
     y = data[label]
     # First, split the data into training (60%) and test (20%) sets
@@ -80,8 +86,10 @@ def model_nb_wss(data, label, recall_level):
     wss = (tn + fn) / n - (1 - recall_level)
 
     #result = pd.DataFrame({'label': y_test, 'prediction_nb': y_test_pred})
+    print(wss)
     return(tn,fn,tp, fp,n,wss)
 
 
-data_result = model_nb_wss(calcium_preprocessed, 'label_included', 0.85)
+data_result = model_nb(calcium_preprocessed, 'label_included', 0.85)
+
 

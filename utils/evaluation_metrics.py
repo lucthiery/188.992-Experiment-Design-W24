@@ -27,7 +27,7 @@ import numpy as np                              # Import numpy for numerical ope
 from sklearn.metrics import confusion_matrix    # Import confusion_matrix for WSS computation
 
 
-def calculate_rrf_by_ranking(y_true, y_scores, percentage=10):
+def rrf_ranking(y_true, y_scores, percentage=10):
     """
     Calculate the RRF (Relevant References Found) using a ranking-based approach.
     
@@ -59,7 +59,7 @@ def calculate_rrf_by_ranking(y_true, y_scores, percentage=10):
     return rrf                                     # Return the computed RRF value
 
 
-def calculate_rrf_random(y_true, percentage=10, seed=None):
+def rrf_random(y_true, percentage=10, seed=None):
     """
     Calculate the RRF (Relevant References Found) using a random split approach.
     
@@ -89,7 +89,7 @@ def calculate_rrf_random(y_true, percentage=10, seed=None):
     return rrf_random                              # Return the RRF value for the random split approach
 
 
-def calculate_rrf_stratified(y_true, percentage=10, seed=None):
+def rrf_stratified(y_true, percentage=10, seed=None):
     """
     Calculate the RRF (Relevant References Found) using a stratified sampling approach.
     
@@ -142,7 +142,7 @@ def calculate_rrf_stratified(y_true, percentage=10, seed=None):
     return rrf_stratified                          # Return the computed RRF value for stratified sampling
 
 
-def calculate_wss(y_true, y_pred, recall_level):
+def wss(y_true, y_pred, recall_level):
     """
     Calculate the WSS (Work Saved over Sampling) score using a confusion matrix.
     
@@ -194,7 +194,7 @@ if __name__ == "__main__":
     percentage = 10           # Percentage of documents to screen for RRF calculations (10%).
     recall_level_85 = 0.85    # Target recall level (85% recall).
     recall_level_95 = 0.95    # Target recall level (95% recall).
-    
+    """
     # Calculate RRF using the ranking-based method.
     rrf_ranking = calculate_rrf_by_ranking(y_true_example, y_scores_example, percentage=percentage)
     # Calculate RRF using the random split method (with a fixed seed for reproducibility).
@@ -213,3 +213,4 @@ if __name__ == "__main__":
     print(f"RRF (Stratified Sampling, {percentage}% screened): {rrf_stratified} relevant documents found")
     print(f"WSS (Work Saved over Sampling, {int(recall_level_85*100)}% recall): {wss_value_85:.4f}")
     print(f"WSS (Work Saved over Sampling, {int(recall_level_95*100)}% recall): {wss_value_95:.4f}")
+"""
