@@ -3,20 +3,13 @@ library(text2vec) # For text embeddings
 library(e1071)    # For SVM
 library(caTools)  # For train-test split
 library(tidyr)
-# Example dataset
 
 calcium <- read.csv2("calcium_preprocessed.csv", sep=",")
 calcium <- subset(calcium, select =c("title","label_included") )
 data <- calcium
-data <- data.frame(
-  text = c("This is a positive review.", "This is a negative review.",
-           "I loved this product!", "I hated this product!", "Amazing quality!",
-           "Worst experience ever."),
-  label = c("positive", "negative", "positive", "negative", "positive", "negative")
-)
 
 # Split data into train and test sets
-set.seed(123) # For reproducibility
+set.seed(12345) # For reproducibility
 split <- sample.split(data$label_included, SplitRatio = 0.7)
 train_data <- subset(data, split == TRUE)
 test_data <- subset(data, split == FALSE)
@@ -36,7 +29,7 @@ vectorizer <- vocab_vectorizer(vocab)
 tcm <- create_tcm(it_train, vectorizer, skip_grams_window = 5)
 
 # Fit GloVe model to generate word embeddings
-glove <- GlobalVectors$new(rank = 60, x_max = 10)
+glove <- GlobalVectors$new(rank = 80, x_max = 20)
 word_vectors <- glove$fit_transform(tcm, n_iter = 20)
 
 # Create document embeddings by averaging word vectors
@@ -89,3 +82,16 @@ cat("Confusion Matrix:\n")
 print(conf_matrix)
 cat(sprintf("Accuracy: %.2f%%\n", accuracy * 100))
 WSS <- 335/(335+30)-0.05
+WSS85 <- 335/(335+30)-0.15
+
+virus <- read.csv2("virus.csv", sep=",")
+virus <- subset(virus, select =c("titles","label_included") )
+data <- virus
+WSS95_v <- 744/(744+36)-0.05
+WSS85_v <- 744/(744+36)-0.15
+
+depression <- read.csv2("depression.csv", sep=",")
+depression <- subset(depression, select =c("titles","label_included") )
+data <- depression
+WSS95_d <- (488+26)/(488+26+61+23)-0.05
+WSS85_d <- (488+26)/(488+26+61+23)-0.15
