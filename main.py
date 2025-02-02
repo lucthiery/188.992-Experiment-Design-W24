@@ -95,8 +95,6 @@ if __name__ == "__main__":
         logger.info(f"Running R script: {r_script_path_requirements}")
         subprocess.run(["Rscript", r_script_path_requirements], check=True)
 
-
-
     # Run the naive bayes model
     print("\n")
     logger.info("Running the naive bayes model...")
@@ -109,20 +107,25 @@ if __name__ == "__main__":
     alternate_nb_with_cv_main()
     logger.info("Alternative naive bayes model with cross-validation completed successfully!")
     
-
-
     # Rund the d2v+svm.R script
     r_script_path_d2v_svm = os.path.join("models", "d2v+svm.R")
+    logger.debug(f"Running R script: {r_script_path_d2v_svm}")
     result = subprocess.run(
         ["Rscript", r_script_path_d2v_svm],
         capture_output=True,  # Fängt Standardausgabe und Fehlerausgabe ein
         text=True             # Gibt die Ausgabe als String zurück
     )
     
-    # # Output the results from the R script
-    # print("R Script Output:")
-    # print(result.stdout)
-    # print("R Script Errors (if existing):")
-    # print(result.stderr)
+    # Output the results from the R script
+    logger.info("R Script Output:")
+    logger.info(result.stdout)
+    logger.info("R Script Errors (if existing):")
+    logger.info(result.stderr)
+
+
+
+    # End of the program
+    logger.info("Program successfully completed!")
+    logger.info("Goodbye!")
 
 

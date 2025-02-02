@@ -128,7 +128,7 @@ These API clients are implemented in the `api/` directory:
 
 The fallback logic is defined in the `utils/data_utils.py` file, where asynchronous tasks are created for each dataset row.  The cascading fallback mechanism (PubMed → OpenAlex → CrossRef) in `utils/data_utils.py` to enrich the data with article metadata. It fetches the metadata such as title and abstract from the given links in the datasets, that can be found in `Data/original`
 
-## Baseline Recreation 
+## Baseline Recreation
 
 We decided to recreate two of the given baslines, the Naive Bayes model with TF-IDF transformation and the SVM with doc2vec embeddings. You can find further information in the folder models in the files "naive_bayes_function.py" and "alternative_nb_with_cv.py" for Naive Bayes and in "d2v+svm.R" for SVM. 
 
@@ -216,14 +216,53 @@ This guide explains how to set up a Python environment using `venv` and install 
    pip install --upgrade pip
    ```
 
-4. **Install Dependencies:**
+4. **Install PythonDependencies:**
    Use the following command to install the required packages listed in `requirements.txt`:
 
    ```bash
    pip install -r requirements.txt
    ```
 
-5. **Verify Installation:**
+5. However, as some code runs in R. You also have to install R and make sure the following dependencies are installed:
+
+   5.1 **R Version**: 4.3.1
+      - Ensure that you have R version 4.3.1 installed. You can download R from the official [R website](https://cran.r-project.org/).
+
+   5.2 **Required Libraries**:
+      - **`text2vec`** (version 0.6.4) for text embeddings, including doc2vec features.
+        Install it using:
+
+        ```R
+        install.packages("text2vec", repos = "https://cloud.r-project.org/")
+        ```
+
+      - **`e1071`** (version 1.7-14) for Support Vector Machines (SVM) implementation with a linear kernel.
+        Install it using:
+
+        ```R
+        install.packages("e1071")
+        ```
+
+      - **`caTools`** for splitting the dataset into training and test sets.
+        Install it using:
+
+        ```R
+        install.packages("caTools")
+        ```
+
+      - **`tidyr`** for data manipulation, including functions to handle missing values and reshape the data.
+        Install it using:
+
+        ```R
+        install.packages("tidyr")
+        ```
+
+   5.4. **GloVe Model for Word Embeddings**:
+      - A GloVe model must be constructed to generate word embeddings. The process involves averaging word vectors to create document embeddings. You can download GloVe from the [GloVe website](https://nlp.stanford.edu/projects/glove/) and use it in your project.
+
+   `IMPORTANT NOTE:` However we also provided an installation scirpt for the R modules that can be found in requirements.R and which is executed during the execution of main.py. However, it might not working under your dev environment and you might have to install the R modules manually by using the provided documentation above.
+
+6. **Verify Installation:**
    Check if the necessary packages are installed correctly by running:
 
    ```bash
@@ -232,11 +271,11 @@ This guide explains how to set up a Python environment using `venv` and install 
 
    This will display all installed packages and their versions.
 
-6. **Run the code:**
+7. **Run the code:**
 
    The code is designed to run automatically, be executing the `main.py` file in the `root directory`.
 
-   To do so, you can run the following command in your cli, assuming you are working with a Linux distribution. For Windows please check the python documentation on how to run python code on Windows. However, we recommend to use WLS when working on Windows.
+   To do so, you can run the following command in your cli, assuming you are working with a Linux distribution. For Windows please check the python documentation on how to run python code on Windows.
 
    ```text
    python3 main.py
@@ -244,7 +283,10 @@ This guide explains how to set up a Python environment using `venv` and install 
 
    When executing this code, make sure you are within the project directory. Otherwise specify the path.
 
-7. **Deactivate the Virtual Environment:**
+   **`IMPORTANT NOTE:`** In order to run the code, you also need to have installed R with Version 4.4 or higher, als the main.py is also running a subprocess for executing R code. In R make sure, you have the following libraries installed, as referenced in our report paper in section 3.3.
+
+
+8. **Deactivate the Virtual Environment:**
 
    Once you have completed your work, deactivate the virtual environment by running:
 
