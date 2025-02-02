@@ -186,7 +186,7 @@ async def append_metadata_with_fallback_async(
         results = await asyncio.gather(*tasks)
 
     # Add the fetched titles and abstracts to the DataFrame
-    result_df["titles"] = [res[0] for res in results]
+    result_df["title"] = [res[0] for res in results]
     result_df["abstracts"] = [res[1] for res in results]
     return result_df
 

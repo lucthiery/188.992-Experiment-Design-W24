@@ -85,13 +85,13 @@ WSS <- 335/(335+30)-0.05
 WSS85 <- 335/(335+30)-0.15
 
 virus <- read.csv2("virus_preprocessed.csv", sep=",")
-virus <- subset(virus, select =c("titles","label_included") )
+virus <- subset(virus, select =c("title","label_included") )
 data <- virus
 WSS95_v <- 744/(744+36)-0.05
 WSS85_v <- 744/(744+36)-0.15
 
 depression <- read.csv2("depression_preprocessed.csv", sep=",")
-depression <- subset(depression, select =c("titles","label_included") )
+depression <- subset(depression, select =c("title","label_included") )
 data <- depression
 WSS95_d <- (488+26)/(488+26+61+23)-0.05
 WSS85_d <- (488+26)/(488+26+61+23)-0.15
