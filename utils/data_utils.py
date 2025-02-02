@@ -98,11 +98,11 @@ async def _fetch_with_fallback(
     title, abstract = await pubmed_client.fetch_pubmed_data(session, str(pmid))
     
     # If PubMed didn't return valid data, and OpenAlex ID is available, fallback to OpenAlex
-    # if title == "No title" and abstract == "No abstract":
-    #     # Check if the OpenAlex ID is available and not empty
-    #     if pd.notna(openalex_id) and str(openalex_id).strip() != "":
-    #         logger.info(f"Falling back to OpenAlex for paper with PMID {pmid} and OpenAlex ID {openalex_id}")
-    #         title, abstract = await openalex_client.fetch_openalex_data(session, str(openalex_id))
+    if title == "No title" and abstract == "No abstract":
+        # Check if the OpenAlex ID is available and not empty
+        if pd.notna(openalex_id) and str(openalex_id).strip() != "":
+            logger.info(f"Falling back to OpenAlex for paper with PMID {pmid} and OpenAlex ID {openalex_id}")
+            title, abstract = await openalex_client.fetch_openalex_data(session, str(openalex_id))
     
     # Return the title and abstract
     return title, abstract

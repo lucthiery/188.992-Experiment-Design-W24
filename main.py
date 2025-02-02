@@ -28,7 +28,7 @@ async def _data_processing():
 
     # Define rate limiting parameters: 5 concurrent requests, 1-second interval between requests
     rate_limit = {
-        "limit": 4,
+        "limit": 3,
         "interval": 1.0
     }
 
