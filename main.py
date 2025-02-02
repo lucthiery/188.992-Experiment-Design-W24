@@ -2,14 +2,21 @@
 import os
 import glob
 import asyncio      # A library for asynchronous programming
+import subprocess
 
 
-# Import project modules
+# Import project modules - helpers
 from utils.logger import Logger
 from utils.data_utils import process_files
+
+# Import project modules - API clients
 from api.pubmed_client import PubMedClient
 from api.openalex_client import OpenAlexClient
 from api.crossref_client import CrossrefClient
+
+# Import project modules - models
+from models.naive_bayes_function import naive_bayes_main
+from models.alternative_nb_with_cv import alternate_nb_with_cv_main
 
 
 # Create a logger instance
@@ -71,10 +78,51 @@ if __name__ == "__main__":
     # Load the data
     logger.info("Program successfully started!")
 
-    # Run the comparison_results.py script
-    logger.info("Running comparison_results.py script...")
+    # Ask the user if they want to load the data initially
+    user_input = input("Do you want to load the data initially? (yes/no): ").strip().lower()
+    if user_input == "yes":
+        logger.info("Data loading started by the user.")
+        # Run the main function
+        asyncio.run(_data_processing())
 
-    # Run the main function
-    asyncio.run(_data_processing())
+    # Install the required R packages if user confirms to do so
+    user_input = input("Do you want to install the required R packages? (yes/no): ").strip().lower()
+    if user_input == "yes":
+        logger.info("Installing required R packages...")
+        
+        # Install the packages using the requirements.R script
+        r_script_path_requirements = os.path.join("requirements.R")
+        logger.info(f"Running R script: {r_script_path_requirements}")
+        subprocess.run(["Rscript", r_script_path_requirements], check=True)
+
+
+
+    # Run the naive bayes model
+    print("\n")
+    logger.info("Running the naive bayes model...")
+    naive_bayes_main()
+    logger.info("Naive bayes model completed successfully!")
+
+    # Run the alternative naive bayes model with cross-validation
+    print("\n")
+    logger.info("Running the alternative naive bayes model with cross-validation...")
+    alternate_nb_with_cv_main()
+    logger.info("Alternative naive bayes model with cross-validation completed successfully!")
+    
+
+
+    # Rund the d2v+svm.R script
+    r_script_path_d2v_svm = os.path.join("models", "d2v+svm.R")
+    result = subprocess.run(
+        ["Rscript", r_script_path_d2v_svm],
+        capture_output=True,  # Fängt Standardausgabe und Fehlerausgabe ein
+        text=True             # Gibt die Ausgabe als String zurück
+    )
+    
+    # # Output the results from the R script
+    # print("R Script Output:")
+    # print(result.stdout)
+    # print("R Script Errors (if existing):")
+    # print(result.stderr)
 
 

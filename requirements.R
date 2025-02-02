@@ -5,18 +5,23 @@ dir.create(library_path, showWarnings = FALSE, recursive = TRUE)
 # Setze das Library-Verzeichnis
 .libPaths(library_path)
 
-# Liste der benötigten Pakete
-packages <- c("text2vec", "e1071", "caTools", "tidyr")
+# Liste der benötigten Pakete (Matrix mit aufnehmen!)
+packages <- c("Matrix", "text2vec", "e1071", "caTools", "tidyr")
 
+# Funktion, die fehlende Pakete installiert
 install_if_missing <- function(packages) {
   for (pkg in packages) {
     if (!requireNamespace(pkg, quietly = TRUE)) {
-      install.packages(pkg, dependencies = TRUE, lib = library_path)
+      install.packages(pkg,
+                       dependencies = TRUE,
+                       lib = library_path,
+                       repos = "https://cloud.r-project.org")
     }
   }
 }
 
+# Installation fehlender Pakete
 install_if_missing(packages)
 
-# Library-Pfad ausgeben (zum Debugging)
-print(paste("R packages installiert in:", library_path))
+# Print Library-Pfad for debugging
+print(paste("R packages installed in:", library_path))
