@@ -62,11 +62,11 @@ df2 = pd.DataFrame(virus_preprocessed)
 
 df3 = pd.DataFrame(depression_preprocessed)
 
-#df['title'] = df['titles']
+df['title'] = df['title']
 
-df2['title'] = df2['titles']
+df2['title'] = df2['title']
 
-df3['title'] = df3['titles']
+df3['title'] = df3['title']
 
 
 #First we start with the plain model without any balancing 

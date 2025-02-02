@@ -8,16 +8,19 @@ from sklearn.pipeline import Pipeline
 from nltk.corpus import stopwords
 from imblearn.over_sampling import SMOTE
 from sklearn.model_selection import train_test_split
+import os
 
 import nltk
 nltk.download('stopwords')
+
+from utils.evaluation_metrics import wss
 
 
 calcium_preprocessed = pd.read_csv('../data/preprocessed/calcium_preprocessed.csv')
 virus_preprocessed = pd.read_csv('../data/preprocessed/virus_preprocessed.csv')
 depression_preprocessed = pd.read_csv('../data/preprocessed/depression_preprocessed.csv')
 
-def model_nb(data, label, recall_level):
+def model_nb(data,dataset_name, label):
     nltk.download('stopwords')
     X = data.drop(label, axis = 1)
     y = data[label]
@@ -77,19 +80,42 @@ def model_nb(data, label, recall_level):
     # Evaluate the retrained model on the test set
     y_test_pred = best_model.predict(X_test)
     # Confusion-Matrix-Komponenten extrahieren
-    tn, fp, fn, tp = confusion_matrix(y_test, y_test_pred).ravel()
+    #tn, fp, fn, tp = confusion_matrix(y_test, y_test_pred).ravel()
 
     # Gesamtanzahl der Beispiele
     n = len(y_test)
 
+    wss_85 = wss(y_test, y_test_pred, 0.85)
+    wss_95 = wss(y_test, y_test_pred, 0.95)
     # WSS nach Formel berechnen
-    wss = (tn + fn) / n - (1 - recall_level)
+    #wss_85 = (tn + fn) / n - (1 -85)
+    #wss_95 = (tn + fn) / n - (1 - 95)
 
     #result = pd.DataFrame({'label': y_test, 'prediction_nb': y_test_pred})
-    print(wss)
-    return(tn,fn,tp, fp,n,wss)
+    print(wss_85)
+    print(wss_95)
+
+    result_data = pd.DataFrame([{
+        "Dataset": dataset_name,
+        "Model": "Plain NB",
+        "WSS@85": wss_85,
+        "WSS@95": wss_95
+    }])
+
+    results_file="../results.csv"
+    # Append to the CSV file if it exists, otherwise create it
+    if os.path.isfile(results_file):
+        result_data.to_csv(results_file, mode='a', header=False, index=False)
+    else:
+        result_data.to_csv(results_file, mode='w', header=True, index=False)
+    #print(f"Appended results for {dataset_name} - {"Plain NB"} to {results_file}")
 
 
-data_result = model_nb(calcium_preprocessed, 'label_included', 0.85)
+
+
+
+result_calcium = model_nb(calcium_preprocessed, "Calcium", 'label_included')
+result_depression = model_nb(depression_preprocessed, "Depression", 'label_included')
+result_virus = model_nb(virus_preprocessed, "Virus", 'label_included')
 
 

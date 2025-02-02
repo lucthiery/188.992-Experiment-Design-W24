@@ -95,3 +95,24 @@ depression <- subset(depression, select =c("titles","label_included") )
 data <- depression
 WSS95_d <- (488+26)/(488+26+61+23)-0.05
 WSS85_d <- (488+26)/(488+26+61+23)-0.15
+
+results <- data.frame(
+  Dataset = c("Calcium", "Virus", "Depression"),
+  Model = c("SVM", "SVM", "SVM"),
+  WSS85 = c(WSS85, WSS85_v, WSS85_d),
+  WSS95 = c(WSS, WSS95_v, WSS95_d)
+)
+
+# Define the results file path (one folder above)
+results_file <- "../results.csv"
+
+# Check if the file exists
+if (file.exists(results_file)) {
+  # Append to existing CSV file
+  write.table(results, file = results_file, append = TRUE, sep = ",", col.names = FALSE, row.names = FALSE)
+} else {
+  # Create new CSV file with headers
+  write.table(results, file = results_file, sep = ",", col.names = TRUE, row.names = FALSE)
+}
+
+cat("Results saved to ../results.csv\n")
